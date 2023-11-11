@@ -1,0 +1,79 @@
+The distance metric I created, mydist(), takes in two points, point_1 and point_2. For each feature in a given datapoint, the function checks if the feature is nominal. If the feature is nominal, and point_1 and point_2 belong to the same categorization within the nominal feature, then the distance between them in that given feature is 0. If they belong to different categorizations within the same nominal feature, then the distance between them in that feature is a 1. If the feature is continuous rather than nominal, then regular euclidean distance is calculated. Someone with a better knowledge and understanding of the dataset would likely be able to adapt this distance metric so that if any of the nominal features are ordered or similar, the assigned distances from them would reflect this ordering. The model using the metric mydist() obtained a test score of around .8, with a testing mean absolute error of about .2. These results are fairly high when compared to the other KNN models that were used in this lab. However, it is still likely that a different model type would be able to get more accurate results on this data.
+
+from sklearn.base import BaseEstimator, ClassifierMixin
+
+class KNNClassifier(BaseEstimator,ClassifierMixin):
+    def __init__(self, columntype=[], weight_type='inverse_distance'): ## add parameters here
+        
+        """
+        Args:
+            columntype for each column tells you if continues[real] or if nominal[categoritcal].
+            weight_type: inverse_distance voting or if non distance weighting. Options = ["no_weight","inverse_distance"]
+        """
+        self.columntype = columntype #Note This won't be needed until part 5
+        self.weight_type = weight_type
+        self.X = []
+        self.y = []
+
+    def fit(self, data, labels):
+        """ Fit the data; run the algorithm (for this lab really just saves the data :D)
+        Args:
+            X (array-like): A 2D numpy array with the training data, excluding targets
+            y (array-like): A 2D numpy array with the training targets
+        Returns:
+            self: this allows this to be chained, e.g. model.fit(X,y).predict(X_test)
+        """
+        
+        self.X = data
+        self.y = labels
+        return self
+    
+    def predict(self, test_set: list):
+        """ Predict all classes for a dataset X
+        Args:
+            X (array-like): A 2D numpy array with the training data, excluding targets
+        Returns:
+            array, shape (n_samples,)
+                Predicted target values per element in X.
+        """
+        def calculate_distance(point_1, point_2):
+            distance_between_points = 0
+            for i in range(len(point_1)):
+                distance_between_points += (point_1[i] - point_2[i])**2
+            return np.sqrt(distance_between_points)
+            
+        for example in test_set:
+            distances = []
+            votes = []
+            for i, point in enumerate(self.X):
+                distances.append((calculate_distance(example, point), self.y[i]))
+            sorted(distances, key=lambda x: x[1])
+            nearest_neighbors = distances[:3]
+
+            if self.weight_type == 'inverse_distance':
+                 
+            
+            else:
+                for neighbor in nearest_neighbors:
+                    votes.append(neighbor[1])
+                assigned_value = max(set(votes), key=votes.count)
+
+        for neighbor in nearest_neighbors:
+
+
+
+
+        
+
+
+    #Returns the Mean score given input data and labels
+    def score(self, X, y):
+        """ Return accuracy of model on a given dataset. Must implement own score function.
+        Args:
+            X (array-like): A 2D numpy array with data, excluding targets
+            y (array-like): A 2D numpy array with targets
+        Returns:
+            score : float
+                Mean accuracy of self.predict(X) wrt. y.
+        """
+        return 0
